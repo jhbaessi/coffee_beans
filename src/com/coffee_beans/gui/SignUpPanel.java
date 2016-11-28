@@ -7,6 +7,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -110,40 +112,44 @@ public class SignUpPanel extends JPanel {
 		passwordPanel.add(passwordWarningLabel);
 				
 		// notice labels
-		JPanel noticePanel = null;
-		try {
-			JLabel upperLabel = new JLabel("By clicking \"Sign Up\", you agree to our");
-			upperLabel.setAlignmentX(CENTER_ALIGNMENT);
-			
-			LinkLabel termsLabel = new LinkLabel("terms of service", new URI("http://www.naver.com"));
-			termsLabel.setAlignmentX(CENTER_ALIGNMENT);
-			
-			JLabel andLabel = new JLabel("and");
-			andLabel.setAlignmentX(CENTER_ALIGNMENT);
-						
-			LinkLabel policyLabel = new LinkLabel("privacy policy", new URI("http://www.naver.com"));
-			policyLabel.setAlignmentX(CENTER_ALIGNMENT);
-			
-			GridBagLayout noticeLayout = new GridBagLayout();			
-			GridBagConstraints layoutConstraints = new GridBagConstraints();
-			layoutConstraints.anchor = GridBagConstraints.CENTER;
-			layoutConstraints.insets = new Insets(1,3,1,3);
-			
-			noticePanel = new JPanel();
-			noticePanel.setAlignmentX(CENTER_ALIGNMENT);
-			noticePanel.setLayout(noticeLayout);
-			
-			layoutConstraints.gridwidth = 3;
-			addToGrid(noticePanel, upperLabel,	layoutConstraints, 0, 0);
-			
-			layoutConstraints.gridwidth = 1;
-			addToGrid(noticePanel, termsLabel,	layoutConstraints, 1, 0);
-			addToGrid(noticePanel, andLabel,	layoutConstraints, 1, 1);
-			addToGrid(noticePanel, policyLabel,	layoutConstraints, 1, 2);
-			
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+		JLabel upperLabel = new JLabel("By clicking \"Sign Up\", you agree to our");
+		upperLabel.setAlignmentX(CENTER_ALIGNMENT);
+		
+		CBLinkLabel termsLabel = new CBLinkLabel(CBStrings.TERMS_OF_SERVICE.toString(), new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.out.println("Clicked 'Terms of service'");
+			}
+		});
+		termsLabel.setAlignmentX(LEFT_ALIGNMENT);
+		
+		CBLinkLabel policyLabel = new CBLinkLabel(CBStrings.PRIVACY_POLICY.toString(), new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.out.println("Clicked 'Privacy policy'");
+			}
+		});
+		policyLabel.setAlignmentX(RIGHT_ALIGNMENT);
+		
+		JLabel andLabel = new JLabel("and");
+		andLabel.setAlignmentX(CENTER_ALIGNMENT);
+					
+		GridBagLayout noticeLayout = new GridBagLayout();			
+		GridBagConstraints layoutConstraints = new GridBagConstraints();
+		layoutConstraints.anchor = GridBagConstraints.CENTER;
+		layoutConstraints.insets = new Insets(1,3,1,3);
+		
+		JPanel noticePanel = new JPanel();
+		noticePanel.setAlignmentX(CENTER_ALIGNMENT);
+		noticePanel.setLayout(noticeLayout);
+		
+		layoutConstraints.gridwidth = 3;
+		addToGrid(noticePanel, upperLabel,	layoutConstraints, 0, 0);
+		
+		layoutConstraints.gridwidth = 1;
+		addToGrid(noticePanel, termsLabel,	layoutConstraints, 1, 0);
+		addToGrid(noticePanel, andLabel,	layoutConstraints, 1, 1);
+		addToGrid(noticePanel, policyLabel,	layoutConstraints, 1, 2);
 		
 		// sign up button
 		JButton signUpButton = new JButton("Sign Up");
