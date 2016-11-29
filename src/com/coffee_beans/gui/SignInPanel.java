@@ -16,9 +16,12 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import com.sun.xml.internal.ws.message.EmptyMessageImpl;
 
 public class SignInPanel extends JPanel {
 	private static final int GAP_VERTICAL = 20;
@@ -27,16 +30,25 @@ public class SignInPanel extends JPanel {
 	private static final int LOGO_HEIGHT = 100;
 
 	private static final int TEXTFIELD_WIDTH = 200;
-	private static final int TEXTFIELD_HEIGHT = 20;
+	private static final int TEXTFIELD_HEIGHT = 30;
 	
 	private static final int SEPARATOR_WIDTH = 400;
 	private static final int SEPARATOR_HEIGHT = 20;
 	
+	private static SignInPanel uniqueInstance;
+	
 	private JTextField emailField;
-	private JTextField passwordField;
+	private JPasswordField passwordField;
 		
-	public SignInPanel() {
+	private SignInPanel() {
 		buildGui();
+	}
+	
+	public static synchronized SignInPanel getInstance() {
+		if (uniqueInstance == null)
+			uniqueInstance = new SignInPanel();
+			
+		return uniqueInstance;
 	}
 	
 	private void buildGui() {
@@ -77,7 +89,7 @@ public class SignInPanel extends JPanel {
 		JLabel passwordLabel = new JLabel(CBStrings.PASSWORD.toString());
 		passwordLabel.setAlignmentX(LEFT_ALIGNMENT);
 
-		passwordField = new JTextField();
+		passwordField = new JPasswordField();
 		passwordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
 		passwordField.setAlignmentX(LEFT_ALIGNMENT);
 		
@@ -90,11 +102,16 @@ public class SignInPanel extends JPanel {
 		passwordPanel.add(passwordField);
 		
 		// sign-in button
-		JButton signInButton = new JButton(CBStrings.PASSWORD.toString());
+		JButton signInButton = new JButton(CBStrings.SIGN_IN.toString());
 		signInButton.setAlignmentX(CENTER_ALIGNMENT);
 		
-		SignInClickedListner signInClickedListner = new SignInClickedListner();
-		signInButton.addActionListener(signInClickedListner);
+		signInButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				System.out.println("Email: " + emailField.getText());
+				System.out.println("Password: " + String.valueOf(passwordField.getPassword()));
+			}
+		});
 		
 		// divider line
 		CBSeparator separator = new CBSeparator(SwingConstants.HORIZONTAL);
@@ -132,6 +149,8 @@ public class SignInPanel extends JPanel {
 		addVerticalGap(GAP_VERTICAL);
 		add(signInButton);
 		addVerticalGap(GAP_VERTICAL);
+		add(separator);
+		addVerticalGap(GAP_VERTICAL);
 		add(linkPanel);
 		
 		setVisible(true);
@@ -139,13 +158,5 @@ public class SignInPanel extends JPanel {
 	
 	private void addVerticalGap(int gap) {
 		add(Box.createRigidArea(new Dimension(0, gap)));
-	}
-}
-
-class SignInClickedListner implements ActionListener {
-
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		// get character strings from email and password fields.
 	}
 }

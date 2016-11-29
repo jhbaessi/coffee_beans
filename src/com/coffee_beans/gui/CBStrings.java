@@ -7,7 +7,8 @@ public enum CBStrings {
 	SIGN_UP				("Sign up"),
 	FOR_GOT_PASSWORD	("For got password"),
 	TERMS_OF_SERVICE	("terms of service"),
-	PRIVACY_POLICY		("privacy policy");
+	PRIVACY_POLICY		("privacy policy"),
+	NOTICE_SIGN_UP		("By clicking \"Sign Up\", you agree to our");
 	
 	private final String text;
 	

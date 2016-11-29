@@ -25,6 +25,8 @@ public class SignUpPanel extends JPanel {
 	private static final int TEXTFIELD_WIDTH = 200;
 	private static final int TEXTFIELD_HEIGHT = 20;
 	
+	private static SignUpPanel uniqueInstance;
+	
 	private JTextField nameField;
 	private JTextField emailField;
 	private JTextField createPasswordField;
@@ -33,7 +35,18 @@ public class SignUpPanel extends JPanel {
 	private JLabel emailWarningLabel;
 	private JLabel passwordWarningLabel;
 	
-	public SignUpPanel() {
+	private SignUpPanel() {
+		buildGui();
+	}
+
+	public static synchronized SignUpPanel getInstance() {
+		if (uniqueInstance == null)
+			uniqueInstance = new SignUpPanel();
+		
+		return uniqueInstance;
+	}
+	
+	private void buildGui() {
 		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
 		
 		setLayout(layout);
@@ -112,7 +125,7 @@ public class SignUpPanel extends JPanel {
 		passwordPanel.add(passwordWarningLabel);
 				
 		// notice labels
-		JLabel upperLabel = new JLabel("By clicking \"Sign Up\", you agree to our");
+		JLabel upperLabel = new JLabel(CBStrings.NOTICE_SIGN_UP.toString());
 		upperLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		CBLinkLabel termsLabel = new CBLinkLabel(CBStrings.TERMS_OF_SERVICE.toString(), new MouseAdapter() {
@@ -152,7 +165,7 @@ public class SignUpPanel extends JPanel {
 		addToGrid(noticePanel, policyLabel,	layoutConstraints, 1, 2);
 		
 		// sign up button
-		JButton signUpButton = new JButton("Sign Up");
+		JButton signUpButton = new JButton(CBStrings.SIGN_UP.toString());
 		signUpButton.setAlignmentX(CENTER_ALIGNMENT);
 		
 		SignUpClickedListner signUpClickedListner = new SignUpClickedListner();
@@ -167,9 +180,9 @@ public class SignUpPanel extends JPanel {
 		
 		add(signUpButton);
 		
-		setVisible(true);
+		setVisible(true);	
 	}
-
+	
 	private void addToGrid(JComponent parent, JComponent component, GridBagConstraints constraints, int x, int y) {
 		constraints.gridx = x;
 		constraints.gridx = y;
