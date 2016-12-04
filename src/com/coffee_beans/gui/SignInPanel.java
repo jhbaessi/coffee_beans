@@ -2,8 +2,6 @@ package com.coffee_beans.gui;
 
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -21,10 +19,15 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import com.sun.xml.internal.ws.message.EmptyMessageImpl;
+import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
+import com.coffee_beans.util.CBEvent;
+import com.coffee_beans.util.CBEvent.Events;
+import com.coffee_beans.util.CBEventListener;
+import com.coffee_beans.util.CBEventSource;
+import com.coffee_beans.util.CBSerializer;
 
-public class SignInPanel extends JPanel {
+public class SignInPanel extends JPanel implements CBEventSource {
 	private static final int GAP_VERTICAL = 20;
 	
 	private static final int LOGO_WIDTH = 200;
@@ -40,7 +43,9 @@ public class SignInPanel extends JPanel {
 	
 	private JTextField emailField;
 	private JPasswordField passwordField;
-		
+	
+	private CBEventListener listener;
+	
 	private SignInPanel() {
 		buildGui();
 	}
@@ -109,8 +114,24 @@ public class SignInPanel extends JPanel {
 		signInButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				System.out.println("Email: " + emailField.getText());
-				System.out.println("Password: " + String.valueOf(passwordField.getPassword()));
+				String email = emailField.getText();
+				String password = String.valueOf(passwordField.getPassword());
+				
+				if (email.isEmpty()) {
+					
+				} else if (password.isEmpty()) {
+					
+				} else {
+					// request for account verification to server
+					if (listener != null) {
+						byte[] bytes = CBSerializer.serialize(new Account(email, password));
+						if (bytes != null) {
+							listener.eventReceived(new CBEvent(this, Events.VERIFY_ACCOUNT, bytes));
+						} else {
+							// failed to serialized
+						}
+					}
+				}
 			}
 		});
 		
@@ -123,7 +144,9 @@ public class SignInPanel extends JPanel {
 		CBLinkLabel signUpLabel = new CBLinkLabel(CBStrings.SIGN_UP.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				System.out.println("Clicked Sign-up");
+				if (listener != null) {
+					listener.eventReceived(new CBEvent(this, Events.MOVE_TO_SIGNUP_PAGE));
+				}
 			}
 		});
 		
@@ -159,5 +182,15 @@ public class SignInPanel extends JPanel {
 	
 	private void addVerticalGap(int gap) {
 		add(Box.createRigidArea(new Dimension(0, gap)));
+	}
+
+	@Override
+	public void addEventListener(CBEventListener listener) {
+		this.listener = listener;
+	}
+
+	@Override
+	public void removeEventListener(CBEventListener listener) {
+		this.listener = null;
 	}
 }
