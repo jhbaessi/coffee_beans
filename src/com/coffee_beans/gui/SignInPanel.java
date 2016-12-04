@@ -22,6 +22,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.sun.xml.internal.ws.message.EmptyMessageImpl;
+import com.coffee_beans.common.CBStrings;
 
 public class SignInPanel extends JPanel {
 	private static final int GAP_VERTICAL = 20;

@@ -27,8 +27,17 @@ public class MessengerPane extends JSplitPane{
 	private static final int BUTTON_ICON_WIDTH = 20;
 	private static final int BUTTON_ICON_HEIGHT = BUTTON_ICON_WIDTH;
 	
-	public MessengerPane() {
+	private static MessengerPane uniqueInstance;
+	
+	private MessengerPane() {
 		buildGui();
+	}
+	
+	public static synchronized MessengerPane getInstance() {
+		if (uniqueInstance == null)
+			uniqueInstance = new MessengerPane();
+		
+		return uniqueInstance;
 	}
 	
 	private void buildGui() {

@@ -1,4 +1,4 @@
-package com.coffee_beans.gui;
+package com.coffee_beans.common;
 
 public enum CBStrings {
 	EMAIL				("Email"),

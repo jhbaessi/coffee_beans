@@ -9,8 +9,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -20,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
+import com.coffee_beans.common.CBStrings;
 
 public class SignUpPanel extends JPanel {
 	private static final int TEXTFIELD_WIDTH = 200;
