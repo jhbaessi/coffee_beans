@@ -126,7 +126,7 @@ public class SignInPanel extends JPanel implements CBEventSource {
 					if (listener != null) {
 						byte[] bytes = CBSerializer.serialize(new Account(email, password));
 						if (bytes != null) {
-							listener.eventReceived(new CBEvent(this, Events.VERIFY_ACCOUNT, bytes));
+							listener.eventReceived(new CBEvent(this, Events.REQ_VERIFYING_ACCOUNT, bytes));
 						} else {
 							// failed to serialized
 						}
@@ -145,7 +145,7 @@ public class SignInPanel extends JPanel implements CBEventSource {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (listener != null) {
-					listener.eventReceived(new CBEvent(this, Events.MOVE_TO_SIGNUP_PAGE));
+					listener.eventReceived(new CBEvent(this, Events.REQ_SIGNUP_PAGE));
 				}
 			}
 		});

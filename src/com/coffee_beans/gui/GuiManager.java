@@ -68,9 +68,9 @@ public class GuiManager implements CBEventListener{
 	public void eventReceived(CBEvent event) {
 		// handle events
 		
-		if (event.getEvent() == Events.MOVE_TO_SIGNUP_PAGE) {
+		if (event.getEvent() == Events.REQ_SIGNUP_PAGE) {
 			setPage(PageIndex.SIGN_UP_PAGE);
-		} else if (event.getEvent() == Events.VERIFY_ACCOUNT) {
+		} else if (event.getEvent() == Events.REQ_VERIFYING_ACCOUNT) {
 			// pass to event handler
 			Account account = (Account)CBSerializer.deserialize(event.getData());
 			

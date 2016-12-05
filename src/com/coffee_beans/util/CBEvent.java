@@ -6,9 +6,16 @@ public class CBEvent extends EventObject {
 	private static final long serialVersionUID = -5572054785385399216L;
 
 	public enum Events {
-		MOVE_TO_SIGNUP_PAGE,
-		
-		VERIFY_ACCOUNT;
+		REQ_SIGNUP_PAGE,
+		REQ_FIND_PASSWORD_PAGE,
+		REQ_MAIN_PAGE,
+		REQ_VERIFYING_ACCOUNT,
+		REQ_NEW_ACCOUNT,
+		REQ_TERMS_OF_SERVICE_PAGE,
+		REQ_PRIVACY_POLICY_PAGE,
+
+		RES_VERIFYING_ACCOUNT,
+		RES_NEW_ACCOUNT,
 	}
 	
 	private Events	event;
