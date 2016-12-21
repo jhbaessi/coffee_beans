@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import com.coffee_beans.common.Account;
 import com.coffee_beans.util.CBEvent;
@@ -17,6 +18,7 @@ public class GuiManager implements CBEventListener{
 	
 	private JFrame mainFrame;
 	private JPanel mainPanel;
+	private JScrollPane mainScrollPane;
 	
 	private enum PageIndex {
 		SIGN_IN_PAGE("Sign in page"), 
@@ -46,17 +48,21 @@ public class GuiManager implements CBEventListener{
 	}
 	
 	private void buildGui() {
-		mainPanel = new JPanel(new CardLayout());	
+		mainPanel = new JPanel(new CardLayout());
 		mainPanel.add(SignInPanel.getInstance(), PageIndex.SIGN_IN_PAGE.toString());
 		mainPanel.add(SignUpPanel.getInstance(), PageIndex.SIGN_UP_PAGE.toString());
 		mainPanel.add(MessengerPane.getInstance(), PageIndex.MESSENGER_PAGE.toString());
+		
+		mainScrollPane = new JScrollPane(mainPanel);
+		mainScrollPane.setViewportView(mainPanel);
+		mainScrollPane.getViewport().setView(mainPanel);
 		
 		mainFrame = new JFrame();		
 		mainFrame.getContentPane().setLayout(new CardLayout());
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(APP_WINDOW_WIDTH, APP_WINDOW_HEIGHT);
 		
-		mainFrame.add(mainPanel);
+		mainFrame.add(new JScrollPane(mainPanel));
 	}
 	
 	public void setPage(PageIndex page) {
