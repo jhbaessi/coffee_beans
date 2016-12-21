@@ -19,9 +19,16 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.coffee_beans.common.Account;
+import com.coffee_beans.common.NewAccount;
 import com.coffee_beans.common.CBStrings;
+import com.coffee_beans.util.CBEvent;
+import com.coffee_beans.util.CBEventListener;
+import com.coffee_beans.util.CBEventSource;
+import com.coffee_beans.util.CBSerializer;
+import com.coffee_beans.util.CBEvent.Events;
 
-public class SignUpPanel extends JPanel {
+public class SignUpPanel extends JPanel implements CBEventSource {
 	private static final int TEXTFIELD_WIDTH = 200;
 	private static final int TEXTFIELD_HEIGHT = 20;
 	
@@ -34,6 +41,8 @@ public class SignUpPanel extends JPanel {
 	
 	private JLabel emailWarningLabel;
 	private JLabel passwordWarningLabel;
+	
+	private CBEventListener listener;
 	
 	private SignUpPanel() {
 		buildGui();
@@ -168,6 +177,35 @@ public class SignUpPanel extends JPanel {
 		JButton signUpButton = new JButton(CBStrings.SIGN_UP.toString());
 		signUpButton.setAlignmentX(CENTER_ALIGNMENT);
 		
+		signUpButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String name = nameField.getText();
+				String email = emailField.getText();
+				String createPassword = createPasswordField.getText();
+				String confirmPassword = confirmPasswordField.getText();
+				
+				if (name.isEmpty()) {
+					
+				} else if (email.isEmpty()){
+					
+				} else if (createPassword.isEmpty()){
+					
+				} else if (confirmPassword.isEmpty()){
+					
+				} else {
+					if (listener != null) {
+						byte[] bytes = CBSerializer.serialize(new NewAccount(name, email, createPassword, confirmPassword));
+						if (bytes != null) {
+							listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
+						} else {
+							// failed to serialized
+						}
+					}
+				}
+			}
+		});
+		
 		SignUpClickedListner signUpClickedListner = new SignUpClickedListner();
 		signUpButton.addActionListener(signUpClickedListner);
 		
@@ -189,6 +227,16 @@ public class SignUpPanel extends JPanel {
 		
 		parent.add(component, constraints);
 	}
+
+	@Override
+	public void addEventListener(CBEventListener listener) {
+		this.listener = listener;		
+	}
+
+	@Override
+	public void removeEventListener(CBEventListener listener) {
+		this.listener = null;
+	}
 }
 
 class SignUpClickedListner implements ActionListener {
@@ -196,5 +244,6 @@ class SignUpClickedListner implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// get character strings from text fields.
+		
 	}
 }
