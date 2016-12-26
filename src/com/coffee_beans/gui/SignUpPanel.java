@@ -1,17 +1,26 @@
 package com.coffee_beans.gui;
 
+import java.awt.Component;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -19,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.coffee_beans.common.Account;
 import com.coffee_beans.common.NewAccount;
 import com.coffee_beans.common.CBStrings;
 import com.coffee_beans.util.CBEvent;
@@ -61,6 +69,18 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		setLayout(layout);
 		setBorder(new EmptyBorder(50,0,50,0));
 		
+		// sign up button
+		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)))));
+		backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		backButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (listener != null) {
+					listener.eventReceived(new CBEvent(this, Events.REQ_MAIN_PAGE));
+				}
+			}
+		});
+				
 		// user name components
 		JLabel nameLabel = new JLabel("User name");
 		nameLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -140,6 +160,12 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		CBLinkLabel termsLabel = new CBLinkLabel(CBStrings.TERMS_OF_SERVICE.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				try {
+					openWebpage(new URI("https://github.com/jhbaessi/coffee_beans"));
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.out.println("Clicked 'Terms of service'");
 			}
 		});
@@ -148,6 +174,12 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		CBLinkLabel policyLabel = new CBLinkLabel(CBStrings.PRIVACY_POLICY.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				try {
+					openWebpage(new URI("https://github.com/jhbaessi/coffee_beans"));
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.out.println("Clicked 'Privacy policy'");
 			}
 		});
@@ -210,6 +242,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		signUpButton.addActionListener(signUpClickedListner);
 		
 		// add components on the Sign-up panel
+		add(backButton);
 		add(namePanel);
 		add(emailPanel);
 		add(passwordPanel);
@@ -236,6 +269,17 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 	@Override
 	public void removeEventListener(CBEventListener listener) {
 		this.listener = null;
+	}
+	
+	private void openWebpage(URI uri) {
+	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+	    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+	        try {
+	            desktop.browse(uri);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
 	}
 }
 
