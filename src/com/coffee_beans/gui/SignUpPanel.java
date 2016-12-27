@@ -1,23 +1,20 @@
 package com.coffee_beans.gui;
 
 import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Image;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -64,13 +61,13 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 	}
 	
 	private void buildGui() {
-		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+		BorderLayout layout = new BorderLayout();
 		
 		setLayout(layout);
 		setBorder(new EmptyBorder(50,0,50,0));
 		
-		// sign up button
-		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)))));
+		// back button
+		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)))));		
 		backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		backButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -80,7 +77,18 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				}
 			}
 		});
-				
+		JPanel backPanel = new JPanel();
+		BoxLayout backLayout = new BoxLayout(backPanel, BoxLayout.Y_AXIS);
+		backPanel.setLayout(backLayout);
+		backPanel.setAlignmentX(CENTER_ALIGNMENT);
+		backPanel.setBorder(new EmptyBorder(0, 50, 0, 0));
+		backPanel.add(backButton);
+		
+		JPanel centerPanel = new JPanel();
+		BoxLayout centerLayout = new BoxLayout(centerPanel, BoxLayout.Y_AXIS);
+		centerPanel.setLayout(centerLayout);
+		centerPanel.setAlignmentX(CENTER_ALIGNMENT);
+		
 		// user name components
 		JLabel nameLabel = new JLabel("User name");
 		nameLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -99,7 +107,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		
 		// email components
 		JLabel emailLabel = new JLabel("Email");
-		emailLabel.setAlignmentX(LEFT_ALIGNMENT);
+		emailLabel.setAlignmentX(LEFT_ALIGNMENT); 
 		
 		emailField = new JTextField();
 		emailField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
@@ -107,7 +115,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		
 		emailWarningLabel = new JLabel("Email is invalid or already taken.");
 		emailWarningLabel.setAlignmentX(LEFT_ALIGNMENT);
-//		emailWarningLabel.setVisible(false);
+//		emailWarningLabel.setVisible(false);	//this function change empty place
 		emailWarningLabel.setOpaque(true);
 		emailWarningLabel.setForeground(Color.RED);
 
@@ -242,14 +250,15 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		signUpButton.addActionListener(signUpClickedListner);
 		
 		// add components on the Sign-up panel
-		add(backButton);
-		add(namePanel);
-		add(emailPanel);
-		add(passwordPanel);
+		add(backPanel, BorderLayout.NORTH);
+		centerPanel.add(namePanel);
+		centerPanel.add(emailPanel);
+		centerPanel.add(passwordPanel);
 		if (noticePanel != null)
-			add(noticePanel);
+			centerPanel.add(noticePanel);
 		
-		add(signUpButton);
+		centerPanel.add(signUpButton);
+		add(centerPanel, BorderLayout.CENTER);
 		
 		setVisible(true);	
 	}
