@@ -4,8 +4,10 @@ import java.awt.CardLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 import com.coffee_beans.common.Account;
+import com.coffee_beans.common.NewAccount;
 import com.coffee_beans.util.CBEvent;
 import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
@@ -17,6 +19,7 @@ public class GuiManager implements CBEventListener{
 	
 	private JFrame mainFrame;
 	private JPanel mainPanel;
+	private JScrollPane mainScrollPane;
 	
 	private enum PageIndex {
 		SIGN_IN_PAGE("Sign in page"), 
@@ -39,6 +42,7 @@ public class GuiManager implements CBEventListener{
 		buildGui();
 		
 		SignInPanel.getInstance().addEventListener(this);
+		SignUpPanel.getInstance().addEventListener(this);
 		
 		setPage(PageIndex.SIGN_IN_PAGE);
 		
@@ -46,17 +50,21 @@ public class GuiManager implements CBEventListener{
 	}
 	
 	private void buildGui() {
-		mainPanel = new JPanel(new CardLayout());	
+		mainPanel = new JPanel(new CardLayout());
 		mainPanel.add(SignInPanel.getInstance(), PageIndex.SIGN_IN_PAGE.toString());
 		mainPanel.add(SignUpPanel.getInstance(), PageIndex.SIGN_UP_PAGE.toString());
 		mainPanel.add(MessengerPane.getInstance(), PageIndex.MESSENGER_PAGE.toString());
+		
+		mainScrollPane = new JScrollPane(mainPanel);
+		mainScrollPane.setViewportView(mainPanel);
+		mainScrollPane.getViewport().setView(mainPanel);
 		
 		mainFrame = new JFrame();		
 		mainFrame.getContentPane().setLayout(new CardLayout());
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(APP_WINDOW_WIDTH, APP_WINDOW_HEIGHT);
 		
-		mainFrame.add(mainPanel);
+		mainFrame.add(new JScrollPane(mainPanel));
 	}
 	
 	public void setPage(PageIndex page) {
@@ -70,6 +78,8 @@ public class GuiManager implements CBEventListener{
 		
 		if (event.getEvent() == Events.REQ_SIGNUP_PAGE) {
 			setPage(PageIndex.SIGN_UP_PAGE);
+		} else if (event.getEvent() == Events.REQ_MAIN_PAGE) {
+			setPage(PageIndex.SIGN_IN_PAGE);
 		} else if (event.getEvent() == Events.REQ_VERIFYING_ACCOUNT) {
 			// pass to event handler
 			Account account = (Account)CBSerializer.deserialize(event.getData());
@@ -77,6 +87,13 @@ public class GuiManager implements CBEventListener{
 			System.out.println("Deserialized data");
 			System.out.println("email: " + account.getEmail());
 			System.out.println("password: " + account.getPassword());
+		} else if (event.getEvent() == Events.REQ_NEW_ACCOUNT){
+			NewAccount newAccount = (NewAccount)CBSerializer.deserialize(event.getData());
+			
+			System.out.println("name: " + newAccount.getName());
+			System.out.println("email: " + newAccount.getEmail());
+			System.out.println("createPasswordField: " + newAccount.getCreatePasswordField());
+			System.out.println("confirmPasswordField: " + newAccount.getconfirmPasswordField());
 		} else {
 			System.out.println("Unknown event");
 		}

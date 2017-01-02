@@ -1,6 +1,9 @@
 package com.coffee_beans.gui;
 
+import java.awt.Component;
+import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -9,9 +12,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -19,9 +25,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.coffee_beans.common.NewAccount;
 import com.coffee_beans.common.CBStrings;
+import com.coffee_beans.util.CBEvent;
+import com.coffee_beans.util.CBEventListener;
+import com.coffee_beans.util.CBEventSource;
+import com.coffee_beans.util.CBSerializer;
+import com.coffee_beans.util.CBEvent.Events;
 
-public class SignUpPanel extends JPanel {
+public class SignUpPanel extends JPanel implements CBEventSource {
 	private static final int TEXTFIELD_WIDTH = 200;
 	private static final int TEXTFIELD_HEIGHT = 20;
 	
@@ -35,6 +47,8 @@ public class SignUpPanel extends JPanel {
 	private JLabel emailWarningLabel;
 	private JLabel passwordWarningLabel;
 	
+	private CBEventListener listener;
+	
 	private SignUpPanel() {
 		buildGui();
 	}
@@ -47,10 +61,33 @@ public class SignUpPanel extends JPanel {
 	}
 	
 	private void buildGui() {
-		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
+		BorderLayout layout = new BorderLayout();
 		
 		setLayout(layout);
 		setBorder(new EmptyBorder(50,0,50,0));
+		
+		// back button
+		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)))));		
+		backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		backButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (listener != null) {
+					listener.eventReceived(new CBEvent(this, Events.REQ_MAIN_PAGE));
+				}
+			}
+		});
+		JPanel backPanel = new JPanel();
+		BoxLayout backLayout = new BoxLayout(backPanel, BoxLayout.Y_AXIS);
+		backPanel.setLayout(backLayout);
+		backPanel.setAlignmentX(CENTER_ALIGNMENT);
+		backPanel.setBorder(new EmptyBorder(0, 50, 0, 0));
+		backPanel.add(backButton);
+		
+		JPanel centerPanel = new JPanel();
+		BoxLayout centerLayout = new BoxLayout(centerPanel, BoxLayout.Y_AXIS);
+		centerPanel.setLayout(centerLayout);
+		centerPanel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		// user name components
 		JLabel nameLabel = new JLabel("User name");
@@ -70,7 +107,7 @@ public class SignUpPanel extends JPanel {
 		
 		// email components
 		JLabel emailLabel = new JLabel("Email");
-		emailLabel.setAlignmentX(LEFT_ALIGNMENT);
+		emailLabel.setAlignmentX(LEFT_ALIGNMENT); 
 		
 		emailField = new JTextField();
 		emailField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
@@ -78,7 +115,7 @@ public class SignUpPanel extends JPanel {
 		
 		emailWarningLabel = new JLabel("Email is invalid or already taken.");
 		emailWarningLabel.setAlignmentX(LEFT_ALIGNMENT);
-//		emailWarningLabel.setVisible(false);
+//		emailWarningLabel.setVisible(false);	//this function change empty place
 		emailWarningLabel.setOpaque(true);
 		emailWarningLabel.setForeground(Color.RED);
 
@@ -131,6 +168,12 @@ public class SignUpPanel extends JPanel {
 		CBLinkLabel termsLabel = new CBLinkLabel(CBStrings.TERMS_OF_SERVICE.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				try {
+					openWebpage(new URI("https://github.com/jhbaessi/coffee_beans"));
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.out.println("Clicked 'Terms of service'");
 			}
 		});
@@ -139,6 +182,12 @@ public class SignUpPanel extends JPanel {
 		CBLinkLabel policyLabel = new CBLinkLabel(CBStrings.PRIVACY_POLICY.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
+				try {
+					openWebpage(new URI("https://github.com/jhbaessi/coffee_beans"));
+				} catch (URISyntaxException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 				System.out.println("Clicked 'Privacy policy'");
 			}
 		});
@@ -168,17 +217,48 @@ public class SignUpPanel extends JPanel {
 		JButton signUpButton = new JButton(CBStrings.SIGN_UP.toString());
 		signUpButton.setAlignmentX(CENTER_ALIGNMENT);
 		
+		signUpButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				String name = nameField.getText();
+				String email = emailField.getText();
+				String createPassword = createPasswordField.getText();
+				String confirmPassword = confirmPasswordField.getText();
+				
+				if (name.isEmpty()) {
+					
+				} else if (email.isEmpty()){
+					
+				} else if (createPassword.isEmpty()){
+					
+				} else if (confirmPassword.isEmpty()){
+					
+				} else {
+					if (listener != null) {
+						byte[] bytes = CBSerializer.serialize(new NewAccount(name, email, createPassword, confirmPassword));
+						if (bytes != null) {
+							listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
+						} else {
+							// failed to serialized
+						}
+					}
+				}
+			}
+		});
+		
 		SignUpClickedListner signUpClickedListner = new SignUpClickedListner();
 		signUpButton.addActionListener(signUpClickedListner);
 		
 		// add components on the Sign-up panel
-		add(namePanel);
-		add(emailPanel);
-		add(passwordPanel);
+		add(backPanel, BorderLayout.NORTH);
+		centerPanel.add(namePanel);
+		centerPanel.add(emailPanel);
+		centerPanel.add(passwordPanel);
 		if (noticePanel != null)
-			add(noticePanel);
+			centerPanel.add(noticePanel);
 		
-		add(signUpButton);
+		centerPanel.add(signUpButton);
+		add(centerPanel, BorderLayout.CENTER);
 		
 		setVisible(true);	
 	}
@@ -189,6 +269,27 @@ public class SignUpPanel extends JPanel {
 		
 		parent.add(component, constraints);
 	}
+
+	@Override
+	public void addEventListener(CBEventListener listener) {
+		this.listener = listener;		
+	}
+
+	@Override
+	public void removeEventListener(CBEventListener listener) {
+		this.listener = null;
+	}
+	
+	private void openWebpage(URI uri) {
+	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
+	    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
+	        try {
+	            desktop.browse(uri);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	}
 }
 
 class SignUpClickedListner implements ActionListener {
@@ -196,5 +297,6 @@ class SignUpClickedListner implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// get character strings from text fields.
+		
 	}
 }
