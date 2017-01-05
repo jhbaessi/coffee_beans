@@ -124,7 +124,7 @@ public class SignInPanel extends JPanel implements CBEventSource {
 				} else {
 					// request for account verification to server
 					if (listener != null) {
-						byte[] bytes = CBSerializer.serialize(new Account(email, password));
+						byte[] bytes = CBSerializer.serialize(new Account(null, email, password));
 						if (bytes != null) {
 							listener.eventReceived(new CBEvent(this, Events.REQ_VERIFYING_ACCOUNT, bytes));
 						} else {
@@ -153,7 +153,9 @@ public class SignInPanel extends JPanel implements CBEventSource {
 		CBLinkLabel forGotLabel = new CBLinkLabel(CBStrings.FOR_GOT_PASSWORD.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				System.out.println("Clicked For got password");
+				if (listener != null) {
+					listener.eventReceived(new CBEvent(this, Events.REQ_ACCOUNT_CONFIRMATION_PAGE));
+				}
 			}
 		});
 		
