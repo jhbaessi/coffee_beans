@@ -2,28 +2,25 @@ package com.coffee_beans.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Image;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JPasswordField;
 import javax.swing.border.EmptyBorder;
 
+import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
 import com.coffee_beans.gui.WarningLabel.WarningStrings;
+import com.coffee_beans.util.CBEvent;
+import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
 import com.coffee_beans.util.CBEventSource;
+import com.coffee_beans.util.CBSerializer;
 
 public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 	private static final int BUTTON_ICON_WIDTH	= 30;
@@ -54,7 +51,7 @@ public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 		JLabel newPasswordLabel = new JLabel(CBStrings.NEW_PASSWORD.toString());
 		newPasswordLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
-		JTextField newPasswordField = new JTextField();
+		JPasswordField newPasswordField = new JPasswordField();
 		newPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
 		newPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
@@ -68,7 +65,7 @@ public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 		JLabel confirmPasswordLabel = new JLabel(CBStrings.CONFIRM_PASSWORD.toString());
 		confirmPasswordLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
-		JTextField confirmPasswordField = new JTextField();
+		JPasswordField confirmPasswordField = new JPasswordField();
 		confirmPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
 		confirmPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
@@ -79,7 +76,7 @@ public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 		confirmPasswordPanel.add(confirmPasswordField);
 
 		// warning message
-		warningLabel = new WarningLabel(WarningStrings.NOT_MATCH_PASSWORD);
+		warningLabel = new WarningLabel(WarningStrings.NO_WARNING);
 		warningLabel.setPreferredSize(new Dimension(700, 30));
 		warningLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
@@ -89,11 +86,29 @@ public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 		updatePasswordButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (warningLabel.getWarning() == WarningStrings.NO_WARNING) {
-					warningLabel.setWarning(WarningStrings.NOT_MATCH_PASSWORD);
+				WarningStrings warning = WarningStrings.NO_WARNING;
+				
+				String newPassword = String.valueOf(newPasswordField.getPassword());
+				String confirmPassword = String.valueOf(confirmPasswordField.getPassword());
+				
+				if (newPassword.isEmpty()) {
+					warning = WarningStrings.ENTER_NEW_PASSWORD;
+				} else if (confirmPassword.isEmpty()) {
+					warning = WarningStrings.ENTER_CONFIRM_PASSWORD;
 				} else {
-					warningLabel.setWarning(WarningStrings.NO_WARNING);
+					if (newPassword.compareTo(confirmPassword) == 0) {
+						if (listener != null) {
+							byte[] bytes = CBSerializer.serialize(new Account(null, null, newPassword));
+							if (bytes != null) {
+								listener.eventReceived(new CBEvent(this, Events.REQ_UPDATE_PASSWORD, bytes));
+							}
+						}
+					} else {
+						warning = WarningStrings.NOT_MATCH_PASSWORD;
+					}
 				}
+				
+				warningLabel.setWarning(warning);
 			}
 		});
 		

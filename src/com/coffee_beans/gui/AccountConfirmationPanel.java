@@ -20,10 +20,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
+import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
 import com.coffee_beans.gui.WarningLabel.WarningStrings;
+import com.coffee_beans.util.CBEvent;
+import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
 import com.coffee_beans.util.CBEventSource;
+import com.coffee_beans.util.CBSerializer;
+import com.coffee_beans.util.EmailAddressFormChecker;
 
 public class AccountConfirmationPanel extends JPanel implements CBEventSource {
 	private static final int BUTTON_ICON_WIDTH	= 30;
@@ -49,7 +54,7 @@ public class AccountConfirmationPanel extends JPanel implements CBEventSource {
 		buildGui();
 	}
 	
-	private void buildGui() {		
+	private void buildGui() {
 		// previous page button
 		JButton prevPageButton = null;
 		try {
@@ -58,6 +63,14 @@ public class AccountConfirmationPanel extends JPanel implements CBEventSource {
 			prevPageButton = new JButton(new ImageIcon(prevPageImg.getScaledInstance(BUTTON_ICON_WIDTH, BUTTON_ICON_HEIGHT, Image.SCALE_SMOOTH)));
 			prevPageButton.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 			prevPageButton.setAlignmentX(LEFT_ALIGNMENT);
+			prevPageButton.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					if (listener != null) {
+						listener.eventReceived(new CBEvent(this, Events.REQ_SIGNIN_PAGE));
+					}
+				}
+			});
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -92,21 +105,39 @@ public class AccountConfirmationPanel extends JPanel implements CBEventSource {
 		emailPanel.add(emailField);
 
 		// warning message
-		warningLabel = new WarningLabel(WarningStrings.NOT_FOUND_USERINFO);
-		warningLabel.setPreferredSize(new Dimension(700, 30));
+		warningLabel = new WarningLabel();
 		warningLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
-		// reset button
+		// request button
 		JButton requestButton = new JButton(CBStrings.REQUEST_ACCOUNT_VERIFICATION.toString());
 		requestButton.setAlignmentX(CENTER_ALIGNMENT);
 		requestButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (warningLabel.getWarning() == WarningStrings.NO_WARNING) {
-					warningLabel.setWarning(WarningStrings.NOT_FOUND_USERINFO);
+				WarningStrings warning = WarningStrings.NO_WARNING;
+				
+				String username = usernameField.getText();
+				String email = emailField.getText();
+				
+				if (username.isEmpty()) {
+					warning = WarningStrings.ENTER_USERNAME;
+				} else if (email.isEmpty()) {
+					warning = WarningStrings.ENTER_EMAIL_ADDRESS;
 				} else {
-					warningLabel.setWarning(WarningStrings.NO_WARNING);
+					EmailAddressFormChecker checker = new EmailAddressFormChecker(email);
+					if (checker.isValid()) {
+						if (listener != null) {
+							byte[] bytes = CBSerializer.serialize(new Account(username, email, null));
+							if (bytes != null) {
+								listener.eventReceived(new CBEvent(this, Events.REQ_VERIFYING_USERINFO, bytes));
+							}
+						}
+					} else {
+						warning = WarningStrings.INVALID_EMAIL_FORM;
+					}
 				}
+				
+				warningLabel.setWarning(warning);
 			}
 		});
 		
