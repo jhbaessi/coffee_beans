@@ -7,7 +7,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import com.coffee_beans.common.Account;
-import com.coffee_beans.common.NewAccount;
 import com.coffee_beans.util.CBEvent;
 import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
@@ -101,12 +100,11 @@ public class GuiManager implements CBEventListener{
 			System.out.println("email: " + account.getEmail());
 			System.out.println("password: " + account.getPassword());
 		} else if (event.getEvent() == Events.REQ_NEW_ACCOUNT){
-			NewAccount newAccount = (NewAccount)CBSerializer.deserialize(event.getData());
+			Account account = (Account)CBSerializer.deserialize(event.getData());
 			
-			System.out.println("name: " + newAccount.getName());
-			System.out.println("email: " + newAccount.getEmail());
-			System.out.println("createPasswordField: " + newAccount.getCreatePasswordField());
-			System.out.println("confirmPasswordField: " + newAccount.getconfirmPasswordField());
+			System.out.println("name: " + account.getUsername());
+			System.out.println("email: " + account.getEmail());
+			System.out.println("password: " + account.getPassword());
 		} else if (event.getEvent() == Events.REQ_VERIFYING_USERINFO) {
 			// for debugging
 			Account account = (Account)CBSerializer.deserialize(event.getData());			

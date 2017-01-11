@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.coffee_beans.common.NewAccount;
+import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
 import com.coffee_beans.util.CBEvent;
 import com.coffee_beans.util.CBEventListener;
@@ -44,8 +44,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 	private JTextField createPasswordField;
 	private JTextField confirmPasswordField;
 	
-	private JLabel emailWarningLabel;
-	private JLabel passwordWarningLabel;
+	private JLabel warningLabel;
 	
 	private CBEventListener listener;
 	
@@ -68,11 +67,18 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		
 		// back button
 		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)))));		
+		backButton.setBorderPainted(false);
+		backButton.setBorder(null);
+		backButton.setContentAreaFilled(false);
 		backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		backButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (listener != null) {
+					nameField.setText(null);
+					emailField.setText(null);
+					createPasswordField.setText(null);
+					confirmPasswordField.setText(null);
 					listener.eventReceived(new CBEvent(this, Events.REQ_MAIN_PAGE));
 				}
 			}
@@ -112,12 +118,6 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		emailField = new JTextField();
 		emailField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
 		emailField.setAlignmentX(LEFT_ALIGNMENT);
-		
-		emailWarningLabel = new JLabel("Email is invalid or already taken.");
-		emailWarningLabel.setAlignmentX(LEFT_ALIGNMENT);
-//		emailWarningLabel.setVisible(false);	//this function change empty place
-		emailWarningLabel.setOpaque(true);
-		emailWarningLabel.setForeground(Color.RED);
 
 		JPanel emailPanel = new JPanel();
 		BoxLayout emailLayout = new BoxLayout(emailPanel, BoxLayout.Y_AXIS);
@@ -126,7 +126,6 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		
 		emailPanel.add(emailLabel);
 		emailPanel.add(emailField);
-		emailPanel.add(emailWarningLabel);
 		
 		// password components
 		JLabel createPasswordLabel = new JLabel("Create a password");
@@ -143,11 +142,11 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		confirmPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
 		confirmPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
-		passwordWarningLabel = new JLabel("These password don't match.");
-		passwordWarningLabel.setAlignmentX(LEFT_ALIGNMENT);
-		passwordWarningLabel.setOpaque(true);
-		passwordWarningLabel.setForeground(Color.RED);
-//		passwordWarningLabel.setVisible(false);
+		warningLabel = new JLabel(" ");
+		warningLabel.setAlignmentX(LEFT_ALIGNMENT);
+		warningLabel.setOpaque(true);
+		warningLabel.setForeground(Color.RED);
+//		warningLabel.setVisible(false);
 		
 		JPanel passwordPanel = new JPanel();
 		BoxLayout passwordLayout = new BoxLayout(passwordPanel, BoxLayout.Y_AXIS);
@@ -159,7 +158,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		passwordPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 		passwordPanel.add(confirmPasswordLabel);
 		passwordPanel.add(confirmPasswordField);		
-		passwordPanel.add(passwordWarningLabel);
+		passwordPanel.add(warningLabel);
 				
 		// notice labels
 		JLabel upperLabel = new JLabel(CBStrings.NOTICE_SIGN_UP.toString());
@@ -224,18 +223,23 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				String email = emailField.getText();
 				String createPassword = createPasswordField.getText();
 				String confirmPassword = confirmPasswordField.getText();
+				String password = null;
 				
 				if (name.isEmpty()) {
-					
+					warningLabel.setText("Name is empty");
 				} else if (email.isEmpty()){
-					
+					warningLabel.setText("Email is empty");
 				} else if (createPassword.isEmpty()){
-					
+					warningLabel.setText("Create a password is empty");
 				} else if (confirmPassword.isEmpty()){
-					
+					warningLabel.setText("Confirm your password is empty");
+				} else if (!createPassword.equals(confirmPassword)){
+					warningLabel.setText("These password don't match.");
 				} else {
+					warningLabel.setText(" ");
 					if (listener != null) {
-						byte[] bytes = CBSerializer.serialize(new NewAccount(name, email, createPassword, confirmPassword));
+						password = createPassword;
+						byte[] bytes = CBSerializer.serialize(new Account(name, email, password));
 						if (bytes != null) {
 							listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
 						} else {
