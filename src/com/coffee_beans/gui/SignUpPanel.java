@@ -1,8 +1,8 @@
 package com.coffee_beans.gui;
 
-import java.awt.Component;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -28,10 +29,11 @@ import javax.swing.border.EmptyBorder;
 import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
 import com.coffee_beans.util.CBEvent;
+import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
 import com.coffee_beans.util.CBEventSource;
 import com.coffee_beans.util.CBSerializer;
-import com.coffee_beans.util.CBEvent.Events;
+import com.coffee_beans.util.HtmlLoader;
 
 public class SignUpPanel extends JPanel implements CBEventSource {
 	private static final int TEXTFIELD_WIDTH = 200;
@@ -167,13 +169,8 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		CBLinkLabel termsLabel = new CBLinkLabel(CBStrings.TERMS_OF_SERVICE.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				try {
-					openWebpage(new URI("https://github.com/jhbaessi/coffee_beans"));
-				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				System.out.println("Clicked 'Terms of service'");
+				String dir = System.getProperty("user.dir") + "/docs/terms_of_service.html";
+				HtmlLoader.loadHtml(new File(dir));
 			}
 		});
 		termsLabel.setAlignmentX(LEFT_ALIGNMENT);
@@ -181,13 +178,8 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		CBLinkLabel policyLabel = new CBLinkLabel(CBStrings.PRIVACY_POLICY.toString(), new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				try {
-					openWebpage(new URI("https://github.com/jhbaessi/coffee_beans"));
-				} catch (URISyntaxException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				System.out.println("Clicked 'Privacy policy'");
+				String dir = System.getProperty("user.dir") + "/docs/privacy_policy.html";
+				HtmlLoader.loadHtml(new File(dir));
 			}
 		});
 		policyLabel.setAlignmentX(RIGHT_ALIGNMENT);
