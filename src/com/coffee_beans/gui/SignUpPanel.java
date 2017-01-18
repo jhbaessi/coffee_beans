@@ -14,7 +14,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,11 +27,13 @@ import javax.swing.border.EmptyBorder;
 
 import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
+import com.coffee_beans.gui.WarningLabel.WarningStrings;
 import com.coffee_beans.util.CBEvent;
 import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
 import com.coffee_beans.util.CBEventSource;
 import com.coffee_beans.util.CBSerializer;
+import com.coffee_beans.util.EmailAddressFormChecker;
 import com.coffee_beans.util.HtmlLoader;
 
 public class SignUpPanel extends JPanel implements CBEventSource {
@@ -46,7 +47,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 	private JTextField createPasswordField;
 	private JTextField confirmPasswordField;
 	
-	private JLabel warningLabel;
+	private WarningLabel warningLabel;
 	
 	private CBEventListener listener;
 	
@@ -81,6 +82,8 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 					emailField.setText(null);
 					createPasswordField.setText(null);
 					confirmPasswordField.setText(null);
+					warningLabel.setWarning(WarningStrings.NO_WARNING);
+					
 					listener.eventReceived(new CBEvent(this, Events.REQ_MAIN_PAGE));
 				}
 			}
@@ -144,11 +147,7 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		confirmPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
 		confirmPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
-		warningLabel = new JLabel(" ");
-		warningLabel.setAlignmentX(LEFT_ALIGNMENT);
-		warningLabel.setOpaque(true);
-		warningLabel.setForeground(Color.RED);
-//		warningLabel.setVisible(false);
+		warningLabel = new WarningLabel();
 		
 		JPanel passwordPanel = new JPanel();
 		BoxLayout passwordLayout = new BoxLayout(passwordPanel, BoxLayout.Y_AXIS);
@@ -218,25 +217,29 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				String password = null;
 				
 				if (name.isEmpty()) {
-					warningLabel.setText("Name is empty");
+					warningLabel.setWarning(WarningStrings.ENTER_USERNAME);
 				} else if (email.isEmpty()){
-					warningLabel.setText("Email is empty");
+					warningLabel.setWarning(WarningStrings.ENTER_EMAIL_ADDRESS);
 				} else if (createPassword.isEmpty()){
-					warningLabel.setText("Create a password is empty");
+					warningLabel.setWarning(WarningStrings.ENTER_PASSWORD);
 				} else if (confirmPassword.isEmpty()){
-					warningLabel.setText("Confirm your password is empty");
+					warningLabel.setWarning(WarningStrings.ENTER_CONFIRM_PASSWORD);
 				} else if (!createPassword.equals(confirmPassword)){
-					warningLabel.setText("These password don't match.");
+					warningLabel.setWarning(WarningStrings.NOT_MATCH_PASSWORD);
 				} else {
-					warningLabel.setText(" ");
-					if (listener != null) {
-						password = createPassword;
-						byte[] bytes = CBSerializer.serialize(new Account(name, email, password));
-						if (bytes != null) {
-							listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
-						} else {
-							// failed to serialized
+					EmailAddressFormChecker formChecker = new EmailAddressFormChecker(email);
+					if (formChecker.isValid()) {
+						if (listener != null) {
+							password = createPassword;
+							byte[] bytes = CBSerializer.serialize(new Account(name, email, password));
+							if (bytes != null) {
+								listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
+							} else {
+								// failed to serialized
+							}
 						}
+					} else {
+						warningLabel.setWarning(WarningStrings.INVALID_EMAIL_FORM);
 					}
 				}
 			}

@@ -11,6 +11,7 @@ public class WarningLabel extends JLabel {
 		
 		ENTER_EMAIL_ADDRESS		("Please enter an email address."),
 		ENTER_USERNAME			("Please enter your username."),
+		ENTER_PASSWORD			("Please enter a password"),
 		ENTER_NEW_PASSWORD		("Please enter a new password."),
 		ENTER_CONFIRM_PASSWORD	("Please enter a confirmation password."),
 		INVALID_EMAIL_FORM		("Email is invalid taken."),
