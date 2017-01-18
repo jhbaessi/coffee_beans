@@ -82,6 +82,8 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 					emailField.setText(null);
 					createPasswordField.setText(null);
 					confirmPasswordField.setText(null);
+					warningLabel.setWarning(WarningStrings.NO_WARNING);
+					
 					listener.eventReceived(new CBEvent(this, Events.REQ_MAIN_PAGE));
 				}
 			}
