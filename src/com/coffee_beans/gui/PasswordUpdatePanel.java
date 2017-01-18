@@ -7,10 +7,13 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.LayoutStyle;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.border.EmptyBorder;
 
 import com.coffee_beans.common.Account;
@@ -46,43 +49,24 @@ public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 		buildGui();
 	}
 	
-	private void buildGui() {		
+	private void buildGui() {
 		// new password components
 		JLabel newPasswordLabel = new JLabel(CBStrings.NEW_PASSWORD.toString());
-		newPasswordLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		JPasswordField newPasswordField = new JPasswordField();
 		newPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		newPasswordField.setAlignmentX(LEFT_ALIGNMENT);
-		
-		JPanel newPasswordPanel = new JPanel();
-		newPasswordPanel.setLayout(new BoxLayout(newPasswordPanel, BoxLayout.Y_AXIS));
-		newPasswordPanel.setAlignmentX(CENTER_ALIGNMENT);
-		newPasswordPanel.add(newPasswordLabel);
-		newPasswordPanel.add(newPasswordField);
 		
 		// confirm password components
 		JLabel confirmPasswordLabel = new JLabel(CBStrings.CONFIRM_PASSWORD.toString());
-		confirmPasswordLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		JPasswordField confirmPasswordField = new JPasswordField();
 		confirmPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		confirmPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
-		JPanel confirmPasswordPanel = new JPanel();
-		confirmPasswordPanel.setLayout(new BoxLayout(confirmPasswordPanel, BoxLayout.Y_AXIS));
-		confirmPasswordPanel.setAlignmentX(CENTER_ALIGNMENT);
-		confirmPasswordPanel.add(confirmPasswordLabel);
-		confirmPasswordPanel.add(confirmPasswordField);
-
 		// warning message
 		warningLabel = new WarningLabel(WarningStrings.NO_WARNING);
-		warningLabel.setPreferredSize(new Dimension(700, 30));
-		warningLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		// update button
 		JButton updatePasswordButton = new JButton(CBStrings.UPDATE_PASSWORD.toString());
-		updatePasswordButton.setAlignmentX(CENTER_ALIGNMENT);
 		updatePasswordButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -112,21 +96,38 @@ public class PasswordUpdatePanel extends JPanel implements CBEventSource {
 			}
 		});
 		
-		JPanel centerPanel = new JPanel();
-		centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-		centerPanel.setBorder(new EmptyBorder(50, 100, 50, 100));
-		centerPanel.add(newPasswordPanel);
-		centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-		centerPanel.add(confirmPasswordPanel);
-		centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-		centerPanel.add(warningLabel);
-		centerPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-		centerPanel.add(updatePasswordButton);
-        
-		setLayout(new BorderLayout());
-		add(centerPanel, BorderLayout.CENTER);
-
-        setVisible(true);
+		// set layout
+		GroupLayout layout = new GroupLayout(this);
+		setLayout(layout);
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
+		
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(layout.createParallelGroup(Alignment.CENTER)
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(newPasswordLabel)
+								.addComponent(newPasswordField))
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(confirmPasswordLabel)
+								.addComponent(confirmPasswordField))
+						.addComponent(warningLabel)
+						.addComponent(updatePasswordButton))
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		);
+		
+		layout.setVerticalGroup(layout.createSequentialGroup()
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(newPasswordLabel)
+						.addComponent(newPasswordField))
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(confirmPasswordLabel)
+						.addComponent(confirmPasswordField))
+				.addComponent(warningLabel)
+				.addComponent(updatePasswordButton)
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		);
 	}
 
 	@Override
