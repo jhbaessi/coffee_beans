@@ -33,6 +33,7 @@ import com.coffee_beans.util.CBEvent.Events;
 import com.coffee_beans.util.CBEventListener;
 import com.coffee_beans.util.CBEventSource;
 import com.coffee_beans.util.CBSerializer;
+import com.coffee_beans.util.EmailAddressFormChecker;
 import com.coffee_beans.util.HtmlLoader;
 
 public class SignUpPanel extends JPanel implements CBEventSource {
@@ -224,15 +225,19 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				} else if (!createPassword.equals(confirmPassword)){
 					warningLabel.setWarning(WarningStrings.NOT_MATCH_PASSWORD);
 				} else {
-					warningLabel.setWarning(WarningStrings.NO_WARNING);
-					if (listener != null) {
-						password = createPassword;
-						byte[] bytes = CBSerializer.serialize(new Account(name, email, password));
-						if (bytes != null) {
-							listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
-						} else {
-							// failed to serialized
+					EmailAddressFormChecker formChecker = new EmailAddressFormChecker(email);
+					if (formChecker.isValid()) {
+						if (listener != null) {
+							password = createPassword;
+							byte[] bytes = CBSerializer.serialize(new Account(name, email, password));
+							if (bytes != null) {
+								listener.eventReceived(new CBEvent(this, Events.REQ_NEW_ACCOUNT, bytes));
+							} else {
+								// failed to serialized
+							}
 						}
+					} else {
+						warningLabel.setWarning(WarningStrings.INVALID_EMAIL_FORM);
 					}
 				}
 			}
