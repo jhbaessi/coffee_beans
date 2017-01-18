@@ -8,16 +8,16 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
-import javax.swing.border.EmptyBorder;
 
 import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
@@ -46,10 +46,6 @@ public class SignInPanel extends JPanel implements CBEventSource {
 	
 	private CBEventListener listener;
 	
-	private SignInPanel() {
-		buildGui();
-	}
-	
 	public static synchronized SignInPanel getInstance() {
 		if (uniqueInstance == null)
 			uniqueInstance = new SignInPanel();
@@ -57,12 +53,11 @@ public class SignInPanel extends JPanel implements CBEventSource {
 		return uniqueInstance;
 	}
 	
+	private SignInPanel() {
+		buildGui();
+	}
+	
 	private void buildGui() {
-		BoxLayout layout = new BoxLayout(this, BoxLayout.Y_AXIS);
-		
-		setLayout(layout);
-		setBorder(new EmptyBorder(50,0,0,50));
-		
 		// logo label
 		JLabel logoLabel = null;
 		try {
@@ -70,46 +65,24 @@ public class SignInPanel extends JPanel implements CBEventSource {
 								.getScaledInstance(LOGO_WIDTH, LOGO_HEIGHT, Image.SCALE_SMOOTH);
 			
 			logoLabel = new JLabel(new ImageIcon(logoImg));
-			logoLabel.setAlignmentX(CENTER_ALIGNMENT);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
 		
 		// email components
 		JLabel emailLabel = new JLabel(CBStrings.EMAIL.toString());
-		emailLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		emailField = new JTextField();
 		emailField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		emailField.setAlignmentX(LEFT_ALIGNMENT);
-		
-		JPanel emailPanel = new JPanel();
-		BoxLayout emailLayout = new BoxLayout(emailPanel, BoxLayout.Y_AXIS);
-		emailPanel.setLayout(emailLayout);
-		emailPanel.setAlignmentX(CENTER_ALIGNMENT);
-		
-		emailPanel.add(emailLabel);
-		emailPanel.add(emailField);
-		
+
 		// password components
 		JLabel passwordLabel = new JLabel(CBStrings.PASSWORD.toString());
-		passwordLabel.setAlignmentX(LEFT_ALIGNMENT);
 
 		passwordField = new JPasswordField();
 		passwordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		passwordField.setAlignmentX(LEFT_ALIGNMENT);
-		
-		JPanel passwordPanel = new JPanel();
-		BoxLayout passwordLayout = new BoxLayout(passwordPanel, BoxLayout.Y_AXIS);
-		passwordPanel.setLayout(passwordLayout);
-		passwordPanel.setAlignmentX(CENTER_ALIGNMENT);
-		
-		passwordPanel.add(passwordLabel);
-		passwordPanel.add(passwordField);
-		
+
 		// sign-in button
 		JButton signInButton = new JButton(CBStrings.SIGN_IN.toString());
-		signInButton.setAlignmentX(CENTER_ALIGNMENT);
 		
 		signInButton.addMouseListener(new MouseAdapter() {
 			@Override
@@ -138,7 +111,6 @@ public class SignInPanel extends JPanel implements CBEventSource {
 		// divider line
 		CBSeparator separator = new CBSeparator(SwingConstants.HORIZONTAL);
 		separator.setMaximumSize(new Dimension(SEPARATOR_WIDTH, SEPARATOR_HEIGHT));
-		separator.setAlignmentX(CENTER_ALIGNMENT);
 		
 		// link components
 		CBLinkLabel signUpLabel = new CBLinkLabel(CBStrings.SIGN_UP.toString(), new MouseAdapter() {
@@ -159,31 +131,50 @@ public class SignInPanel extends JPanel implements CBEventSource {
 			}
 		});
 		
-		JPanel linkPanel = new JPanel();
-		linkPanel.setAlignmentX(CENTER_ALIGNMENT);
+		JLabel orLabel = new JLabel("or");
 		
-		linkPanel.add(signUpLabel);
-		linkPanel.add(new JLabel("or"));
-		linkPanel.add(forGotLabel);
+		// set layout
+		GroupLayout layout = new GroupLayout(this);
+		setLayout(layout);
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
 		
-		// add components on the Sign-in panel.
-		add(logoLabel);
-		addVerticalGap(GAP_VERTICAL);
-		add(emailPanel);
-		addVerticalGap(GAP_VERTICAL);
-		add(passwordPanel);
-		addVerticalGap(GAP_VERTICAL);
-		add(signInButton);
-		addVerticalGap(GAP_VERTICAL);
-		add(separator);
-		addVerticalGap(GAP_VERTICAL);
-		add(linkPanel);
-		
-		setVisible(true);
-	}
-	
-	private void addVerticalGap(int gap) {
-		add(Box.createRigidArea(new Dimension(0, gap)));
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(layout.createParallelGroup(Alignment.CENTER)
+						.addComponent(logoLabel)
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(emailLabel)
+								.addComponent(emailField))
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(passwordLabel)
+								.addComponent(passwordField))
+						.addComponent(signInButton)
+						.addComponent(separator)
+						.addGroup(layout.createSequentialGroup()
+								.addComponent(signUpLabel)
+								.addComponent(orLabel)
+								.addComponent(forGotLabel)))
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		);
+
+		layout.setVerticalGroup(layout.createSequentialGroup()
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addComponent(logoLabel)
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(emailLabel)
+						.addComponent(emailField))
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(passwordLabel)
+						.addComponent(passwordField))
+				.addComponent(signInButton)
+				.addComponent(separator)
+				.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+						.addComponent(signUpLabel)
+						.addComponent(orLabel)
+						.addComponent(forGotLabel))
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+		);
 	}
 
 	@Override
