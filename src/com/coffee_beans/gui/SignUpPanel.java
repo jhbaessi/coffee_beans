@@ -1,29 +1,21 @@
 package com.coffee_beans.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.net.URI;
 
-import javax.swing.Box;
-import javax.swing.BoxLayout;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.border.EmptyBorder;
+import javax.swing.LayoutStyle;
 
 import com.coffee_beans.common.Account;
 import com.coffee_beans.common.CBStrings;
@@ -37,8 +29,11 @@ import com.coffee_beans.util.EmailAddressFormChecker;
 import com.coffee_beans.util.HtmlLoader;
 
 public class SignUpPanel extends JPanel implements CBEventSource {
-	private static final int TEXTFIELD_WIDTH = 200;
-	private static final int TEXTFIELD_HEIGHT = 20;
+	private static final int BUTTON_ICON_WIDTH	= 30;
+	private static final int BUTTON_ICON_HEIGHT	= 30;
+	
+	private static final int TEXTFIELD_WIDTH = 300;
+	private static final int TEXTFIELD_HEIGHT = 30;
 	
 	private static SignUpPanel uniqueInstance;
 	
@@ -50,10 +45,6 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 	private WarningLabel warningLabel;
 	
 	private CBEventListener listener;
-	
-	private SignUpPanel() {
-		buildGui();
-	}
 
 	public static synchronized SignUpPanel getInstance() {
 		if (uniqueInstance == null)
@@ -62,18 +53,16 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 		return uniqueInstance;
 	}
 	
+	private SignUpPanel() {
+		buildGui();
+	}
+	
 	private void buildGui() {
-		BorderLayout layout = new BorderLayout();
-		
-		setLayout(layout);
-		setBorder(new EmptyBorder(50,0,50,0));
-		
 		// back button
-		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(16, 16, java.awt.Image.SCALE_SMOOTH)))));		
+		JButton backButton = new JButton(new ImageIcon(((new ImageIcon("images/Back_Button.png").getImage().getScaledInstance(BUTTON_ICON_WIDTH, BUTTON_ICON_HEIGHT, java.awt.Image.SCALE_SMOOTH)))));		
 		backButton.setBorderPainted(false);
 		backButton.setBorder(null);
 		backButton.setContentAreaFilled(false);
-		backButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 		backButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -88,82 +77,34 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				}
 			}
 		});
-		JPanel backPanel = new JPanel();
-		BoxLayout backLayout = new BoxLayout(backPanel, BoxLayout.Y_AXIS);
-		backPanel.setLayout(backLayout);
-		backPanel.setAlignmentX(CENTER_ALIGNMENT);
-		backPanel.setBorder(new EmptyBorder(0, 50, 0, 0));
-		backPanel.add(backButton);
-		
-		JPanel centerPanel = new JPanel();
-		BoxLayout centerLayout = new BoxLayout(centerPanel, BoxLayout.Y_AXIS);
-		centerPanel.setLayout(centerLayout);
-		centerPanel.setAlignmentX(CENTER_ALIGNMENT);
-		
+
 		// user name components
-		JLabel nameLabel = new JLabel("User name");
-		nameLabel.setAlignmentX(LEFT_ALIGNMENT);
+		JLabel nameLabel = new JLabel(CBStrings.USERNAME.toString());
 		
 		nameField = new JTextField();
 		nameField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		nameField.setAlignmentX(LEFT_ALIGNMENT);
-		
-		JPanel namePanel = new JPanel();
-		BoxLayout nameLayout = new BoxLayout(namePanel, BoxLayout.Y_AXIS);
-		namePanel.setLayout(nameLayout);
-		namePanel.setAlignmentX(CENTER_ALIGNMENT);
-		
-		namePanel.add(nameLabel);
-		namePanel.add(nameField);
 		
 		// email components
-		JLabel emailLabel = new JLabel("Email");
-		emailLabel.setAlignmentX(LEFT_ALIGNMENT); 
+		JLabel emailLabel = new JLabel(CBStrings.EMAIL.toString());
 		
 		emailField = new JTextField();
 		emailField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		emailField.setAlignmentX(LEFT_ALIGNMENT);
 
-		JPanel emailPanel = new JPanel();
-		BoxLayout emailLayout = new BoxLayout(emailPanel, BoxLayout.Y_AXIS);
-		emailPanel.setLayout(emailLayout);
-		emailPanel.setAlignmentX(CENTER_ALIGNMENT);
-		
-		emailPanel.add(emailLabel);
-		emailPanel.add(emailField);
-		
 		// password components
-		JLabel createPasswordLabel = new JLabel("Create a password");
-		createPasswordLabel.setAlignmentX(LEFT_ALIGNMENT);
+		JLabel createPasswordLabel = new JLabel(CBStrings.CREATE_PASSWORD.toString());
 		
 		createPasswordField = new JTextField();
 		createPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		createPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
-		JLabel confirmPasswordLabel = new JLabel("Confirm your password");
-		confirmPasswordLabel.setAlignmentX(LEFT_ALIGNMENT);
+		JLabel confirmPasswordLabel = new JLabel(CBStrings.CONFIRM_PASSWORD.toString());
 		
 		confirmPasswordField = new JTextField();
 		confirmPasswordField.setMaximumSize(new Dimension(TEXTFIELD_WIDTH, TEXTFIELD_HEIGHT));
-		confirmPasswordField.setAlignmentX(LEFT_ALIGNMENT);
 		
 		warningLabel = new WarningLabel();
 		
-		JPanel passwordPanel = new JPanel();
-		BoxLayout passwordLayout = new BoxLayout(passwordPanel, BoxLayout.Y_AXIS);
-		passwordPanel.setLayout(passwordLayout);
-		passwordPanel.setAlignmentX(CENTER_ALIGNMENT);
-		
-		passwordPanel.add(createPasswordLabel);
-		passwordPanel.add(createPasswordField);
-		passwordPanel.add(Box.createRigidArea(new Dimension(0, 5)));
-		passwordPanel.add(confirmPasswordLabel);
-		passwordPanel.add(confirmPasswordField);		
-		passwordPanel.add(warningLabel);
-				
 		// notice labels
 		JLabel upperLabel = new JLabel(CBStrings.NOTICE_SIGN_UP.toString());
-		upperLabel.setAlignmentX(CENTER_ALIGNMENT);
 		
 		CBLinkLabel termsLabel = new CBLinkLabel(CBStrings.TERMS_OF_SERVICE.toString(), new MouseAdapter() {
 			@Override
@@ -172,7 +113,6 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				HtmlLoader.loadHtml(new File(dir));
 			}
 		});
-		termsLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		CBLinkLabel policyLabel = new CBLinkLabel(CBStrings.PRIVACY_POLICY.toString(), new MouseAdapter() {
 			@Override
@@ -181,32 +121,11 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 				HtmlLoader.loadHtml(new File(dir));
 			}
 		});
-		policyLabel.setAlignmentX(RIGHT_ALIGNMENT);
 		
 		JLabel andLabel = new JLabel("and");
-		andLabel.setAlignmentX(CENTER_ALIGNMENT);
 					
-		GridBagLayout noticeLayout = new GridBagLayout();			
-		GridBagConstraints layoutConstraints = new GridBagConstraints();
-		layoutConstraints.anchor = GridBagConstraints.CENTER;
-		layoutConstraints.insets = new Insets(1,3,1,3);
-		
-		JPanel noticePanel = new JPanel();
-		noticePanel.setAlignmentX(CENTER_ALIGNMENT);
-		noticePanel.setLayout(noticeLayout);
-		
-		layoutConstraints.gridwidth = 3;
-		addToGrid(noticePanel, upperLabel,	layoutConstraints, 0, 0);
-		
-		layoutConstraints.gridwidth = 1;
-		addToGrid(noticePanel, termsLabel,	layoutConstraints, 1, 0);
-		addToGrid(noticePanel, andLabel,	layoutConstraints, 1, 1);
-		addToGrid(noticePanel, policyLabel,	layoutConstraints, 1, 2);
-		
 		// sign up button
 		JButton signUpButton = new JButton(CBStrings.SIGN_UP.toString());
-		signUpButton.setAlignmentX(CENTER_ALIGNMENT);
-		
 		signUpButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -245,28 +164,66 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 			}
 		});
 		
-		SignUpClickedListner signUpClickedListner = new SignUpClickedListner();
-		signUpButton.addActionListener(signUpClickedListner);
+		// set layout
+		GroupLayout layout = new GroupLayout(this);
+		setLayout(layout);
+		layout.setAutoCreateGaps(true);
+		layout.setAutoCreateContainerGaps(true);
 		
-		// add components on the Sign-up panel
-		add(backPanel, BorderLayout.NORTH);
-		centerPanel.add(namePanel);
-		centerPanel.add(emailPanel);
-		centerPanel.add(passwordPanel);
-		if (noticePanel != null)
-			centerPanel.add(noticePanel);
+		layout.setHorizontalGroup(layout.createSequentialGroup()
+				.addComponent(backButton)
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(layout.createParallelGroup(Alignment.CENTER)
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(nameLabel)
+								.addComponent(nameField))
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(emailLabel)
+								.addComponent(emailField))
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(createPasswordLabel)
+								.addComponent(createPasswordField))
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(confirmPasswordLabel)
+								.addComponent(confirmPasswordField))
+						.addComponent(warningLabel)
+						.addGroup(layout.createParallelGroup(Alignment.LEADING)
+								.addComponent(upperLabel)
+								.addGroup(layout.createSequentialGroup()
+										.addComponent(termsLabel)
+										.addComponent(andLabel)
+										.addComponent(policyLabel)))
+						.addComponent(signUpButton))
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, backButton.getPreferredSize().width, backButton.getMaximumSize().width)
+		);
 		
-		centerPanel.add(signUpButton);
-		add(centerPanel, BorderLayout.CENTER);
-		
-		setVisible(true);	
-	}
-	
-	private void addToGrid(JComponent parent, JComponent component, GridBagConstraints constraints, int x, int y) {
-		constraints.gridx = x;
-		constraints.gridx = y;
-		
-		parent.add(component, constraints);
+		layout.setVerticalGroup(layout.createSequentialGroup()
+				.addComponent(backButton)
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(nameLabel)
+						.addComponent(nameField))
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(emailLabel)
+						.addComponent(emailField))
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(createPasswordLabel)
+						.addComponent(createPasswordField))
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(confirmPasswordLabel)
+						.addComponent(confirmPasswordField))
+				.addComponent(warningLabel)
+				.addGroup(layout.createSequentialGroup()
+						.addComponent(upperLabel)
+						.addGroup(layout.createParallelGroup(Alignment.BASELINE)
+								.addComponent(termsLabel)
+								.addComponent(andLabel)
+								.addComponent(policyLabel)))
+				.addComponent(signUpButton)
+				.addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+				.addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED, backButton.getPreferredSize().height, backButton.getMaximumSize().height)
+		);
 	}
 
 	@Override
@@ -277,17 +234,6 @@ public class SignUpPanel extends JPanel implements CBEventSource {
 	@Override
 	public void removeEventListener(CBEventListener listener) {
 		this.listener = null;
-	}
-	
-	private void openWebpage(URI uri) {
-	    Desktop desktop = Desktop.isDesktopSupported() ? Desktop.getDesktop() : null;
-	    if (desktop != null && desktop.isSupported(Desktop.Action.BROWSE)) {
-	        try {
-	            desktop.browse(uri);
-	        } catch (Exception e) {
-	            e.printStackTrace();
-	        }
-	    }
 	}
 }
 
