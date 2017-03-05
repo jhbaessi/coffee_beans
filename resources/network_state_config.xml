@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+    Document   : config.xml
+    Created on : 02 March, 2017
+    Author     : Jeonghwan Bae
+    Description:
+        File specifies states and transition of the CoffeeBean's network
+-->
+
+<FSM>
+	<STATE id="START" type="ID">
+		<MESSAGE id="START" action="start" nextState="DISCONNECTED"/>
+	</STATE>
+	<STATE id="DISCONNECTED">
+		<MESSAGE id="DISCONNECTED" action="connection" nextState="CONNECTING"/>
+		<MESSAGE id="EXIT" action="exit" nextState="END"/>
+	</STATE>
+	<STATE id="CONNECTING">
+		<MESSAGE id="TIMEOUT" action="timeout" nextState="DISCONNECTED"/>
+		<MESSAGE id="FAILEDCONNECTION" action="failedConnection" nextState="DISCONNECTED"/>
+		<MESSAGE id="DISCONNECTION" action="disconnection" nextState="DISCCONNECTED"/>
+		<MESSAGE id="CONNECTION" action="connection" nextState="CONNECTED"/>
+	</STATE>
+	<STATE id="CONNECTED">
+		<MESSAGE id="DISCONNECTION" action="disconnection" nextState="DISCONNECTED"/>
+	</STATE>
+	<STATE id="END">
+	</STATE>
+</FSM>
