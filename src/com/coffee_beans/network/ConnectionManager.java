@@ -53,6 +53,27 @@ public class ConnectionManager {
 			e.printStackTrace();
 		}
 	}
+
+	public static void connectTest() {
+		XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
+				.setUsernameAndPassword(USERNAME, PASSWORD)
+				.setServiceName(SERVICENAME)
+				.setPort(PORT)
+				.setSecurityMode(SecurityMode.disabled)
+				.setDebuggerEnabled(true)
+				.build();
+		
+		conn = new XMPPTCPConnection(config);
+		
+		try {
+			conn.connect();
+			isConnected = STATE.CONNECTED;	
+		} catch (SmackException | IOException | XMPPException e) {
+			// TODO Auto-generated catch block
+			isConnected = STATE.TIMEOUT;
+			e.printStackTrace();
+		}
+	}
 		
 	public static void disconnect(){
 		conn.disconnect();
