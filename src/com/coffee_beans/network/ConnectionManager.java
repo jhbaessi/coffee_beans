@@ -99,4 +99,8 @@ public class ConnectionManager {
 		}
 		return isConnected;
 	}
+	
+	public static AbstractXMPPConnection getConnection(){
+		return conn;
+	}
 }
