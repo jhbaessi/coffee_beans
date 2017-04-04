@@ -15,19 +15,19 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
  * @author jhbae & tskim
  */ 
 public class ConnectionManager {
-	private static final String USERNAME = "user_test";//"admin";
+	private static final String USERNAME = "test";//"admin";
 	private static final String PASSWORD = "test";//"smile";
 	private static final String SERVICENAME = "localhost";//"127.0.0.1";
 	private static final int PORT = 5222;
-	private static STATE isConnected = STATE.DISCONNECTED;
+	private static State isConnected = State.DISCONNECTED;
 	
 	private static AbstractXMPPConnection conn;
-	
-	private enum STATE{
-		CONNECTED,
-		DISCONNECTED,
-		TIMEOUT,
-		DISCONNECTEDONERROR;
+
+	private enum State{
+		CONNECTED,				// Client and server connect
+		DISCONNECTED,			// Disconnect the server by the client
+		TIMEOUT,				// Login fail
+		DISCONNECTEDONERROR;	// Abnormal disconnect
 	}
 	
 	public ConnectionManager() {
@@ -46,17 +46,17 @@ public class ConnectionManager {
 		
 		try {
 			conn.connect();
-			isConnected = STATE.CONNECTED;	
+			isConnected = State.CONNECTED;	
 		} catch (SmackException | IOException | XMPPException e) {
 			// TODO Auto-generated catch block
-			isConnected = STATE.TIMEOUT;
+			isConnected = State.TIMEOUT;
 			e.printStackTrace();
 		}
+		
 	}
 
-	public static void connectTest() {
+	public void connectTest() {
 		XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration.builder()
-				.setUsernameAndPassword(USERNAME, PASSWORD)
 				.setServiceName(SERVICENAME)
 				.setPort(PORT)
 				.setSecurityMode(SecurityMode.disabled)
@@ -67,17 +67,17 @@ public class ConnectionManager {
 		
 		try {
 			conn.connect();
-			isConnected = STATE.CONNECTED;	
+			isConnected = State.CONNECTED;	
 		} catch (SmackException | IOException | XMPPException e) {
 			// TODO Auto-generated catch block
-			isConnected = STATE.TIMEOUT;
+			isConnected = State.TIMEOUT;
 			e.printStackTrace();
 		}
 	}
 		
 	public static void disconnect(){
 		conn.disconnect();
-		isConnected = STATE.DISCONNECTED;
+		isConnected = State.DISCONNECTED;
 	}
 	
 	public static void login(){
@@ -89,12 +89,12 @@ public class ConnectionManager {
 		}
 	}
 	
-	public static STATE getConnectedStatus(){
-		if(isConnected == STATE.CONNECTED){
+	public static State getConnectedStatus(){
+		if(isConnected == State.CONNECTED){
 			if(conn.isConnected() == true){
-				isConnected = STATE.CONNECTED;
+				isConnected = State.CONNECTED;
 			} else {
-				isConnected = STATE.DISCONNECTEDONERROR;
+				isConnected = State.DISCONNECTEDONERROR;
 			}
 		}
 		return isConnected;
